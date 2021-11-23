@@ -2,7 +2,11 @@
 
 Session Traversal Utilities for NAT (STUN)
 
-This will detect STUN and create two logs:
+This is a Zeek protocol analyzer that detects STUN based on Spicy.
+You must install [Spicy](https://docs.zeek.org/projects/spicy/en/latest/)
+to use this package.
+
+This package will create two logs:
 
 - stun.log - This log has every STUN message.
 - stun_nat.log - This log has NAT detections from mapped addresses.
