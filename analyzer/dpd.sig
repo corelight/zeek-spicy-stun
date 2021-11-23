@@ -1,7 +1,11 @@
-# TODO: Use this file to optionally declare signatures which can be used to activate your analyzers.
-#
-# signature dpd_STUN {
-#     ip-proto == tcp
-#     payload /^\x11\x22\x33\x44/
-#     enable "spicy_STUN"
-# }
+signature STUN {
+  ip-proto == udp
+  payload /^.{4}\x21\x12\xa4\x42/
+  enable "spicy_STUN"
+}
+
+signature STUN_TCP {
+  ip-proto == tcp
+  payload /^.{4}\x21\x12\xa4\x42/
+  enable "spicy_STUN_TCP"
+}
