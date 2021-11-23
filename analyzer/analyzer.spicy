@@ -1,0 +1,7 @@
+# TODO: Define your analyzers here.
+
+module zeek_spicy_stun;
+
+public type STUN = unit {
+    payload: bytes &eod;
+};

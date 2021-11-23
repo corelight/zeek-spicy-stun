@@ -1,0 +1,15 @@
+# This file sets up protocol confirmation/rejection for analyzers.
+
+module Zeek_zeek_spicy_stun;
+
+import zeek_spicy_stun;
+import zeek;
+
+# TODO: For DPD, protocol analyzers should confirm or reject a protocol.
+# on zeek_spicy_stun::STUN::%done {
+#     zeek::confirm_protocol();
+# }
+#
+# on zeek_spicy_stun::STUN::%error {
+#     zeek::reject_protocol("error while parsing STUN record");
+# }
