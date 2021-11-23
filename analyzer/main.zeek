@@ -7,46 +7,46 @@ export {
 	## This is reported for every STUN message.
 	type Info: record {
 		### Time the first packet was encountered
-		ts:             time            &log &default=network_time();
+		ts:             time                        &log &default=network_time();
 		### Unique ID for the connection
-		uid:            string          &log;
+		uid:            string                      &log;
 		## The connection's 4-tuple of endpoint addresses/ports
-		id:             conn_id         &log;
+		id:             conn_id                     &log;
 		## The protocol
-		proto:			transport_proto	&log;
+		proto:			transport_proto	            &log;
 		# Is orig
-		is_orig: 		bool 			&log;
+		is_orig: 		bool 			            &log;
 		## The transaction ID
-		trans_id:		string			&log;
+		trans_id:		string			            &log;
 		## The STUN method
-		method:			string			&log;
+		method:			string			            &log;
 		## The STUN class
-		class:			string			&log;
+		class:			string			            &log;
 		## The attribute type
-		attr_type:		string			&log;
+		attr_types:		vector of string			&log;
 		## The attribute value
-		attr_val:		string			&log;
+		attr_vals:		vector of string			&log;
 	};
 
 	## The record type which contains the fields of the STUN_NAT log.
 	## This is reported only when there is a successful binding.
 	type NATInfo: record {
 		### Time the first packet was encountered
-		ts:             time            &log &default=network_time();
+		ts:             time                    &log &default=network_time();
 		### Unique ID for the connection
-		uid:            string          &log;
+		uid:            string                  &log;
 		## The connection's 4-tuple of endpoint addresses/ports
-		id:             conn_id         &log;
+		id:             conn_id                 &log;
 		## The protocol
-		proto:			transport_proto	&log;
+		proto:			transport_proto	        &log;
 		# Is orig
-		is_orig: 		bool 			&log;
+		is_orig: 		bool 			        &log;
 		## The WAN address as reported by STUN
-		wan_addr:		addr			&log;
+		wan_addrs:		vector of addr			&log;
 		## The mapped port
-		wan_port:		count			&log;
+		wan_ports:		vector of count			&log;
 		## The NAT'd LAN address as reported by STUN
-		lan_addr:		addr			&log;
+		lan_addrs:		vector of addr			&log;
 	};
 
 	## Event that can be handled to access the STUN
@@ -75,35 +75,45 @@ export {
 }
 
 redef record connection += {
-	stuns: vector of Info &optional;
-	stun_nat: vector of NATInfo &optional;
+	stun: Info &optional;
+	stun_nat: NATInfo &optional;
 };
 
 function set_session(c: connection)
 	{
-	if ( ! c?$stuns )
+	if ( ! c?$stun )
 		{
-		c$stuns = vector();
+		c$stun = Info();
 		}
 	if ( ! c?$stun_nat )
 		{
-		c$stun_nat = vector();
+		c$stun_nat = NATInfo();
 		}
 	}
 
 event STUN::STUNPacket(c: connection, is_orig: bool, method: count, class: count, trans_id: string)
 	{
 	set_session(c);
-	for (s in c$stuns)
-		{
-		Log::write(LOG, c$stuns[s]);
-		}
-	delete c$stuns;
-	for (s in c$stun_nat)
-		{
-		Log::write(LOG_NAT, c$stun_nat[s]);
-		}
-	delete c$stun_nat;
+
+    c$stun$id = c$id;
+    c$stun$uid = c$uid;
+    c$stun$proto = get_conn_transport_proto(c$id);
+    c$stun$is_orig = is_orig;
+    c$stun$trans_id = trans_id;
+    c$stun$method = methodtype[method];
+    c$stun$class = classtype[class];
+    Log::write(LOG, c$stun);
+    delete c$stun;
+
+    if (|c$stun_nat$wan_addrs| > 0)
+        {
+        c$stun_nat$id = c$id;
+        c$stun_nat$uid = c$uid;
+        c$stun_nat$proto = get_conn_transport_proto(c$id);
+        c$stun_nat$is_orig = is_orig;
+        Log::write(LOG_NAT, c$stun_nat);
+        }
+    delete c$stun_nat;
 	}
 
 event STUN::string_attribute(c: connection, is_orig: bool, method: count, class: count, trans_id: string,
@@ -115,9 +125,9 @@ event STUN::string_attribute(c: connection, is_orig: bool, method: count, class:
 		{
 		attr_val = cat(bytestring_to_count(attr_val));
 		}
-	local i = Info($uid=c$uid, $id=c$id, $proto=get_conn_transport_proto(c$id), $is_orig=is_orig, $trans_id=trans_id,
-				   $method=methodtype[method], $class=classtype[class], $attr_type=attrtype[attr_type], $attr_val=attr_val);
-	c$stuns += i;
+
+    c$stun$attr_types += attrtype[attr_type];
+    c$stun$attr_vals += attr_val;
 	}
 
 event STUN::mapped_address_attribute(c: connection, is_orig: bool, method: count, class: count, trans_id: string,
@@ -153,12 +163,15 @@ event STUN::mapped_address_attribute(c: connection, is_orig: bool, method: count
 		wan_port = x_port;
 		}
 	attr_val = cat(wan_addr, ":", wan_port);
-	c$stuns += Info($uid=c$uid, $id=c$id, $proto=get_conn_transport_proto(c$id), $is_orig=is_orig, $trans_id=trans_id,
-					$method=methodtype[method], $class=classtype[class], $attr_type=attrtype[attr_type], $attr_val=attr_val);
+    c$stun$attr_types += attrtype[attr_type];
+    c$stun$attr_vals += attr_val;
 	# MAPPED_ADDRESS || XOR_MAPPED_ADDRESS for BINDING and RESPONSE_SUCCESS
 	if ((attr_type == 0x01 || attr_type == 0x020) && wan_addr != lan_addr && method == 0x01 && class == 0x02)
-		c$stun_nat += NATInfo($uid=c$uid, $id=c$id, $proto=get_conn_transport_proto(c$id), $is_orig=is_orig, $wan_addr=wan_addr,
-					$wan_port=wan_port, $lan_addr=lan_addr);
+        {
+        c$stun_nat$wan_addrs += wan_addr;
+        c$stun_nat$wan_ports += wan_port;
+        c$stun_nat$lan_addrs += lan_addr;
+        }
 	}
 
 event STUN::error_code_attribute(c: connection, is_orig: bool, method: count, class: count, trans_id: string,
@@ -179,9 +192,9 @@ event STUN::error_code_attribute(c: connection, is_orig: bool, method: count, cl
 	err_code = (err_class * 100) + number;
 
 	local attr_val = cat(err_code, " ", reason);
-	local i = Info($uid=c$uid, $id=c$id, $proto=get_conn_transport_proto(c$id), $is_orig=is_orig, $trans_id=trans_id,
-				   $method=methodtype[method], $class=classtype[class], $attr_type=attrtype[attr_type], $attr_val=attr_val);
-	c$stuns += i;
+
+    c$stun$attr_types += attrtype[attr_type];
+    c$stun$attr_vals += attr_val;
 	}
 
 event zeek_init() &priority=5
