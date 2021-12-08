@@ -15,17 +15,17 @@ export {
 		## The protocol
 		proto:			transport_proto	            &log;
 		# Is orig
-		is_orig: 		bool 			            &log;
+		is_orig: 		bool 			            &log &optional;
 		## The transaction ID
-		trans_id:		string			            &log;
+		trans_id:		string			            &log &optional;
 		## The STUN method
-		method:			string			            &log;
+		method:			string			            &log &optional;
 		## The STUN class
-		class:			string			            &log;
+		class:			string			            &log &optional;
 		## The attribute type
-		attr_types:		vector of string			&log;
+		attr_types:		vector of string			&log &optional;
 		## The attribute value
-		attr_vals:		vector of string			&log;
+		attr_vals:		vector of string			&log &optional;
 	};
 
 	## The record type which contains the fields of the STUN_NAT log.
@@ -40,13 +40,13 @@ export {
 		## The protocol
 		proto:			transport_proto	        &log;
 		# Is orig
-		is_orig: 		bool 			        &log;
+		is_orig: 		bool 			        &log &optional;
 		## The WAN address as reported by STUN
-		wan_addrs:		vector of addr			&log;
+		wan_addrs:		vector of addr			&log &optional;
 		## The mapped port
-		wan_ports:		vector of count			&log;
+		wan_ports:		vector of count			&log &optional;
 		## The NAT'd LAN address as reported by STUN
-		lan_addrs:		vector of addr			&log;
+		lan_addrs:		vector of addr			&log &optional;
 	};
 
 	## Event that can be handled to access the STUN
@@ -83,11 +83,16 @@ function set_session(c: connection)
 	{
 	if ( ! c?$stun )
 		{
-		c$stun = Info();
+		c$stun = [$id=c$id, $uid=c$uid, $proto=get_conn_transport_proto(c$id)];
+		c$stun$attr_types = vector();
+		c$stun$attr_vals = vector();
 		}
 	if ( ! c?$stun_nat )
 		{
-		c$stun_nat = NATInfo();
+		c$stun_nat = [$id=c$id, $uid=c$uid, $proto=get_conn_transport_proto(c$id)];
+		c$stun_nat$wan_addrs = vector();
+		c$stun_nat$wan_ports = vector();
+		c$stun_nat$lan_addrs = vector();
 		}
 	}
 
@@ -95,9 +100,6 @@ event STUN::STUNPacket(c: connection, is_orig: bool, method: count, class: count
 	{
 	set_session(c);
 
-    c$stun$id = c$id;
-    c$stun$uid = c$uid;
-    c$stun$proto = get_conn_transport_proto(c$id);
     c$stun$is_orig = is_orig;
     c$stun$trans_id = trans_id;
     c$stun$method = methodtype[method];
@@ -107,9 +109,6 @@ event STUN::STUNPacket(c: connection, is_orig: bool, method: count, class: count
 
     if (|c$stun_nat$wan_addrs| > 0)
         {
-        c$stun_nat$id = c$id;
-        c$stun_nat$uid = c$uid;
-        c$stun_nat$proto = get_conn_transport_proto(c$id);
         c$stun_nat$is_orig = is_orig;
         Log::write(LOG_NAT, c$stun_nat);
         }
