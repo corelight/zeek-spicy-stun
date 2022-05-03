@@ -3,6 +3,9 @@ module STUN;
 export {
 	redef enum Log::ID += { LOG, LOG_NAT };
 
+	global log_policy: Log::PolicyHook;
+	global log_policy_nat: Log::PolicyHook;
+
 	## The record type which contains the fields of the STUN log.
 	## This is reported for every STUN message.
 	type Info: record {
@@ -198,6 +201,6 @@ event STUN::error_code_attribute(c: connection, is_orig: bool, method: count, cl
 
 event zeek_init() &priority=5
 	{
-	Log::create_stream(STUN::LOG, [$columns=Info, $ev=log_stun, $path="stun"]);
-	Log::create_stream(STUN::LOG_NAT, [$columns=NATInfo, $ev=log_stun_nat, $path="stun_nat"]);
+	Log::create_stream(STUN::LOG, [$columns=Info, $ev=log_stun, $path="stun", $policy=log_policy]);
+	Log::create_stream(STUN::LOG_NAT, [$columns=NATInfo, $ev=log_stun_nat, $path="stun_nat", $policy=log_policy_nat]);
 	}
