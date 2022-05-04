@@ -1,3 +1,4 @@
+v0.2.5: Changed Baseline to baseline 
 v0.2.4: Added log policy hooks.
 v0.2.3: Added consts.zeek to cmake file.
 v0.2.2: Fixed tests for Zeek v4.2.
