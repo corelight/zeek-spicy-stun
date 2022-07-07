@@ -1,3 +1,4 @@
+v0.2.7:	Make ready for Zeek v5.
 v0.2.6: Fixed tests for Spicy v1.4.1.
 v0.2.5: Changed Baseline to baseline 
 v0.2.4: Added log policy hooks.
