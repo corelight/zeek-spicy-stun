@@ -183,7 +183,7 @@ type Attribute = unit(method: uint16, class: uint16, trans_id: bytes) {
 		AttrType::ICE_CONTROLLED -> ICE_CONTROLLED: bytes &size=self.attr_length;
 		AttrType::ICE_CONTROLLING -> ICE_CONTROLLING: bytes &size=self.attr_length;
 		# TODO: One could add more handlers here.
-		* -> attr_value: bytes &size=self.total_size;
+		* -> attr_value: bytes &size=self.attr_length;
 	};
 	padding: bytes &size=self.value_padding;
 };
