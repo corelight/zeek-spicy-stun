@@ -1,9 +1,10 @@
-v0.2.8:	Make tests ready for Zeek v5.
-v0.2.7:	Make ready for Zeek v5.
-v0.2.6: Fixed tests for Spicy v1.4.1.
-v0.2.5: Changed Baseline to baseline 
-v0.2.4: Added log policy hooks.
-v0.2.3: Added consts.zeek to cmake file.
-v0.2.2: Fixed tests for Zeek v4.2.
-v0.2.0: Smaller log format.
-v0.1.0: Initial import from spicy-analyzers.
+v0.2.9:     Fixed a byte field size in attributes.
+v0.2.8:	    Make tests ready for Zeek v5.
+v0.2.7:	    Make ready for Zeek v5.
+v0.2.6:     Fixed tests for Spicy v1.4.1.
+v0.2.5:     Changed Baseline to baseline 
+v0.2.4:     Added log policy hooks.
+v0.2.3:     Added consts.zeek to cmake file.
+v0.2.2:     Fixed tests for Zeek v4.2.
+v0.2.0:     Smaller log format.
+v0.1.0:     Initial import from spicy-analyzers.
