@@ -140,7 +140,7 @@ public type STUNPacket = unit {
 	msg_length: uint16;
 	: MAGIC_COOKIE;
 	trans_id: bytes &size=12;
-	attributes: Attribute(self.M, self.C, self.trans_id)[];
+	attributes: Attribute(self.M, self.C, self.trans_id)[] &size=self.msg_length;
 };
 
 #       0                   1                   2                   3

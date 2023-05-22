@@ -1,3 +1,4 @@
+v0.2.10:    Add a size limit to the packet attributes vector.
 v0.2.9:     Fixed a byte field size in attributes.
 v0.2.8:	    Make tests ready for Zeek v5.
 v0.2.7:	    Make ready for Zeek v5.
