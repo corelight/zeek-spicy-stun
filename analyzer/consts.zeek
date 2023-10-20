@@ -13,14 +13,20 @@ export {
 		[0x0B] = "CONNECTIONBIND",
 		[0x0C] = "CONNECTIONATTEMPT",
 		[0x080] = "GOOG-PING",
-	} &default = function(n: count): string { return fmt("unknown-methodtype-%d", n); };
+	} &default=function(n: count): string
+		{
+		return fmt("unknown-methodtype-%d", n);
+		};
 
 	const classtype = {
 		[0x00] = "REQUEST",
 		[0x01] = "INDICATION",
 		[0x02] = "RESPONSE_SUCCESS",
 		[0x03] = "RESPONSE_ERROR",
-	} &default = function(n: count): string { return fmt("unknown-classtype-%d", n); };
+	} &default=function(n: count): string
+		{
+		return fmt("unknown-classtype-%d", n);
+		};
 
 	const attrtype = {
 		[0x0001] = "MAPPED_ADDRESS",
@@ -78,5 +84,8 @@ export {
 		[0xC05C] = "GOOG_DELTA",
 		[0xC05D] = "GOOG_DELTA_ACK",
 		[0xC060] = "GOOG_MESSAGE_INTEGRITY_32",
-	} &default = function(n: count): string { return fmt("unknown-attrtype-%d", n); };
+	} &default=function(n: count): string
+		{
+		return fmt("unknown-attrtype-%d", n);
+		};
 }

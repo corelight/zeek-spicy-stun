@@ -1,4 +1,4 @@
-# @TEST-EXEC: zeek -Cr ${TRACES}/stun-ice-testcall.pcap %INPUT
+# @TEST-EXEC: $ZEEK -Cr ${TRACES}/stun-ice-testcall.pcap %INPUT
 # @TEST-EXEC: btest-diff conn.log
 # @TEST-EXEC: btest-diff stun.log
 # @TEST-EXEC: btest-diff stun_nat.log
