@@ -1,3 +1,4 @@
+v0.2.12:    Make Zeek v7 ready.
 v0.2.11:    Various improvements throughout the code.
 v0.2.10:    Add a size limit to the packet attributes vector.
 v0.2.9:     Fixed a byte field size in attributes.
